@@ -1,8 +1,8 @@
 import { Product } from "../entities/product";
-import { ProductsCatalogRespository } from "../entities/productsCatalogRespositoryInterface";
+import { ProductCatalogRespository } from "../entities/productsCatalogRespositoryInterface";
 
-const createProductsCatalogRepository = (): ProductsCatalogRespository => ({
-  async getProductsCatalog(source: string, fileName: string): Promise<Product[]> {
+const createProductsCatalogRepository = (): ProductCatalogRespository => ({
+  async getProductCatalog(source: string, fileName: string): Promise<Product[]> {
     return new Promise((resolve, reject) => {
       const catalogProducts: Product[] = [
         {
