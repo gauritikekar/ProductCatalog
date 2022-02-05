@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es2016",                                  
+    "module": "commonjs",                                
+    "esModuleInterop": true,
+    "outDir": "lib",                             
+    "strict": true,                                      
+    "skipLibCheck": true                                 
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_moodules", "__tests__/**/*"]
+}
