@@ -1,77 +1,30 @@
 import { StatusCodes } from "http-status-codes";
-import { Product } from "../../entities/product";
-import { createProductsCatalogRepository } from "../../infrastructure/productsCatalogRepository";
+import { getSkuToProductMapForMergedCatalogProducts } from "../../entities/barcode";
+import {
+  CatalogProduct,
+  getMergedCatalogProducts,
+  getTotalListOfCatalogProducts,
+  saveMergedCatalogProduct,
+} from "../../entities/catalogProduct";
 import { errors } from "../../utils/errors";
 
-interface BarcodeMapValue {
-  source: string;
-  supplierId: string;
-  sku: string;
-}
-
-const productsCatalogRepository = createProductsCatalogRepository();
-
-const getProductCatalogData = async (
-  source: string,
-  fileName: string
-): Promise<Product[]> => {
-  return await productsCatalogRepository.getProductCatalog(source, fileName);
-};
-
-const getProductBarcodeData = async (
-  source: string,
-  fileName: string
-): Promise<Map<string, BarcodeMapValue>> => {
+const getMergedProducts = async (): Promise<CatalogProduct[]> => {
   try {
-    const barcodeData = await productsCatalogRepository.getBarcodeData(
-      source,
-      fileName
+    const totalListOfCatalogProducts = await getTotalListOfCatalogProducts();
+
+    const skuToProductsMapForMergedProducts =
+      await getSkuToProductMapForMergedCatalogProducts(
+        totalListOfCatalogProducts
+      );
+
+    const mergedProducts = getMergedCatalogProducts(
+      skuToProductsMapForMergedProducts
     );
-    const barcodeMap = new Map();
-    barcodeData.forEach((data) =>
-      barcodeMap.set(data.barcode, {
-        source: data.source,
-        supplierId: data.supplierId,
-        sku: data.sku,
-      })
-    );
-    return barcodeMap;
+
+    await saveMergedCatalogProduct(mergedProducts);
+    return Promise.resolve(mergedProducts);
   } catch (error) {
-    throw error;
-  }
-};
-
-const getProducts = async (): Promise<Product[]> => {
-  const product: Product[] = [
-    {
-      sku: "1ewe3-34wd",
-      description: "product name",
-      source: "A",
-    },
-  ];
-
-  try {
-    const productCatalogForA = getProductCatalogData(
-      "A",
-      "./src/infrastructure/fileStorage/input/catalogA.csv"
-    );
-    const productCatalogForB = getProductCatalogData(
-      "B",
-      "./src/infrastructure/fileStorage/input/catalogB.csv"
-    );
-
-    const barcodeMapForA = getProductBarcodeData(
-      "A",
-      "./src/infrastructure/fileStorage/input/barcodesA.csv"
-    );
-
-    const barcodeMapForB = getProductBarcodeData(
-      "B",
-      "./src/infrastructure/fileStorage/input/barcodesB.csv"
-    );
-    return Promise.resolve(product);
-  } catch (error) {
-    console.log("error");
+    console.log("error", error);
     throw errors.createHttpError(
       new Error(`Error in getting products catalog`),
       StatusCodes.INTERNAL_SERVER_ERROR
@@ -79,4 +32,4 @@ const getProducts = async (): Promise<Product[]> => {
   }
 };
 
-export { getProducts };
+export { getMergedProducts };

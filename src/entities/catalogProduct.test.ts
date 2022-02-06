@@ -128,6 +128,7 @@ describe("catalogProducts", () => {
       const mockSaveMergedCatalogProduct = jest
         .fn()
         .mockRejectedValue(new Error("Error in saving products"));
+      
       const mockProductRepository: Partial<ProductCatalogRespository> = {
         saveMergedCatalogProduct: mockSaveMergedCatalogProduct,
       };

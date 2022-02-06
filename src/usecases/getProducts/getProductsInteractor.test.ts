@@ -1,6 +1,8 @@
 import { ProductCatalogRespository } from "../../entities/productsCatalogRespositoryInterface";
-import { getProducts } from "./getProductsInteractor";
-import * as createProductsCatalogRespository from "../../infrastructure/productsCatalogRepository";
+import { getMergedProducts } from "./getProductsInteractor";
+import * as productsEntity from "../../entities/catalogProduct";
+import * as barcodeEntity from "../../entities/barcode";
+import { resolve } from "path/posix";
 
 describe("getProducts", () => {
   const mockProduct = {
@@ -9,43 +11,49 @@ describe("getProducts", () => {
     source: "A",
   };
 
-  it("should return all the products if products repository returns products", async () => {
-    const mockGetProductCatalog = jest.fn().mockResolvedValue([mockProduct]);
-    const mockProductRepository: Partial<ProductCatalogRespository> = {
-      getProductCatalog: mockGetProductCatalog,
-    };
+  const getListOfTotalProductsSpy = jest.spyOn(
+    productsEntity,
+    "getTotalListOfCatalogProducts"
+  );
+  const saveMergedCatalogProductSpy = jest.spyOn(
+    productsEntity,
+    "saveMergedCatalogProduct"
+  );
+  const getMergedCatalogProductsSpy = jest
+    .spyOn(productsEntity, "getMergedCatalogProducts")
+    .mockReturnValue([mockProduct]);
 
-    jest
-      .spyOn(
-        createProductsCatalogRespository,
-        "createProductsCatalogRepository"
-      )
-      .mockReturnValue(mockProductRepository as ProductCatalogRespository);
+  const getSkuToProductMapForMergedCatalogProductsSpy = jest.spyOn(
+    barcodeEntity,
+    "getSkuToProductMapForMergedCatalogProducts"
+  );
 
-    const products = await getProducts();
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
 
+  it("should return merged products if products entity returns merged products successfully", async () => {
+    const products = await getMergedProducts();
+
+    expect(getListOfTotalProductsSpy).toHaveBeenCalled();
+    expect(getSkuToProductMapForMergedCatalogProductsSpy).toHaveBeenCalled();
+    expect(getMergedCatalogProductsSpy).toHaveBeenCalled();
+    expect(saveMergedCatalogProductSpy).toHaveBeenCalled();
     expect(products).toEqual([mockProduct]);
   });
 
-  it.skip("should throw error if products repository throws error", async () => {
-    const mockGetProductCatalog = jest
-      .fn()
-      .mockRejectedValue(new Error("Error in getting products"));
-    const mockProductCatalogRepository: Partial<ProductCatalogRespository> = {
-      getProductCatalog: mockGetProductCatalog,
-    };
-
+  it.each`
+    entity            | functionName                                    | description
+    ${productsEntity} | ${"getTotalListOfCatalogProducts"}              | ${"products entity throws error while getting total list of catalog products"}
+    ${productsEntity} | ${"saveMergedCatalogProduct"}                   | ${"products entity throws error while saving merged catalog products"}
+    ${productsEntity} | ${"getMergedCatalogProducts"}                   | ${"products entity throws error while getting merged catalog products"}
+    ${barcodeEntity}  | ${"getSkuToProductMapForMergedCatalogProducts"} | ${"barcode entity throws error while getting sku to product map"}
+  `("should throw error if $description", async ({ entity, functionName }) => {
     jest
-      .spyOn(
-        createProductsCatalogRespository,
-        "createProductsCatalogRepository"
-      )
-      .mockReturnValue(
-        mockProductCatalogRepository as ProductCatalogRespository
-      );
-
-    await expect(getProducts()).rejects.toThrowError(
-      "Error in getting products"
+      .spyOn(entity, functionName)
+      .mockRejectedValue(new Error("Error in getting products catalog"));
+    await expect(getMergedProducts()).rejects.toThrowError(
+      "Error in getting products catalog"
     );
   });
 });
