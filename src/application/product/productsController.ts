@@ -5,7 +5,7 @@ import { toHttpStatus } from "../../utils/errors";
 import { getProducts } from "../../usecases/getProducts/getProductsInteractor";
 
 const createProductsController = (): ProductsController => ({
-  handleGetProducts: async (ctx: Context) => {
+  handleMergeCatalogProducts: async (ctx: Context) => {
     try {
       const products = await getProducts();
       ctx.response.status = StatusCodes.OK;

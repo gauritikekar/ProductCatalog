@@ -36,7 +36,7 @@ describe("productsController", () => {
         .spyOn(getProductsInteractor, "getProducts")
         .mockResolvedValue(mockProducts);
 
-      await createProductsController().handleGetProducts(mockContext);
+      await createProductsController().handleMergeCatalogProducts(mockContext);
       expect(getProductSpy).toHaveBeenCalled();
       expect(mockContext.status).toEqual(StatusCodes.OK);
       expect(mockContext.body).toEqual(mockProducts);
@@ -51,7 +51,7 @@ describe("productsController", () => {
         .spyOn(getProductsInteractor, "getProducts")
         .mockRejectedValue(new Error("Error in receiving products"));
 
-      await createProductsController().handleGetProducts(mockContext);
+      await createProductsController().handleMergeCatalogProducts(mockContext);
       expect(mockContext.throw).toHaveBeenCalledWith(
         StatusCodes.INTERNAL_SERVER_ERROR,
         "Error in receiving products"
