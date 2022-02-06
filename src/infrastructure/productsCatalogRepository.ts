@@ -1,16 +1,18 @@
 import csv from "csv-parser";
 import fs from "fs";
-import { BarcodeData } from "../entities/barcodeData";
-import { Product } from "../entities/product";
+import { createObjectCsvWriter as createCsvWriter } from "csv-writer";
+
+import { BarcodeFileData } from "../entities/barcode";
+import { CatalogProduct } from "../entities/catalogProduct";
 import { ProductCatalogRespository } from "../entities/productsCatalogRespositoryInterface";
 
 const createProductsCatalogRepository = (): ProductCatalogRespository => ({
   async getProductCatalog(
     source: string,
     fileName: string
-  ): Promise<Product[]> {
+  ): Promise<CatalogProduct[]> {
     return new Promise((resolve, reject) => {
-      const products: Product[] = [];
+      const products: CatalogProduct[] = [];
       fs.createReadStream(fileName)
         .pipe(csv())
         .on("data", (data) =>
@@ -32,9 +34,9 @@ const createProductsCatalogRepository = (): ProductCatalogRespository => ({
   async getBarcodeData(
     source: string,
     fileName: string
-  ): Promise<BarcodeData[]> {
+  ): Promise<BarcodeFileData[]> {
     return new Promise((resolve, reject) => {
-      const productsBarcode: BarcodeData[] = [];
+      const productsBarcode: BarcodeFileData[] = [];
       fs.createReadStream(fileName)
         .pipe(csv())
         .on("data", (data) =>
@@ -51,6 +53,29 @@ const createProductsCatalogRepository = (): ProductCatalogRespository => ({
         .on("error", (error) => {
           reject(error);
         });
+    });
+  },
+
+  async saveMergedCatalogProduct(
+    products: CatalogProduct[],
+    fileName: string
+  ): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      const csvWriter = createCsvWriter({
+        path: fileName,
+        header: [
+          { id: "sku", title: "SKU" },
+          { id: "description", title: "Description" },
+          { id: "source", title: "Source" },
+        ],
+      });
+      csvWriter
+        .writeRecords(products)
+        .then(() => {
+          console.log("The CSV file was written successfully");
+          resolve(true);
+        })
+        .catch((error) => reject(error));
     });
   },
 });
