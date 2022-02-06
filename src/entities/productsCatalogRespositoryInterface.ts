@@ -1,3 +1,4 @@
+import { BarcodeData } from "./barcodeData";
 import { Product } from "./product";
 
 interface ProductCatalogRespository {
