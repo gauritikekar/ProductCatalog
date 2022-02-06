@@ -2,13 +2,14 @@ import { Context } from "koa";
 import { ProductsController } from "./productsControllerInterface";
 import { StatusCodes } from "http-status-codes";
 import { toHttpStatus } from "../../utils/errors";
-import { mergeProducts } from "../../usecases/getProducts/getProductsInteractor";
+import { getMergedProducts } from "../../usecases/getProducts/getProductsInteractor";
 
 const createProductsController = (): ProductsController => ({
-  handleMergeCatalogProducts: async (ctx: Context) => {
+  handleGetCatalogProducts: async (ctx: Context) => {
     try {
-      await mergeProducts();
+      const products = await getMergedProducts();
       ctx.response.status = StatusCodes.OK;
+      ctx.body = products;
     } catch (error) {
       ctx.throw(
         toHttpStatus(error),

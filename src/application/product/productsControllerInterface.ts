@@ -2,7 +2,7 @@ import { ComposedMiddleware } from "koa-compose";
 import { Context } from "koa";
 
 interface ProductsController {
-  handleMergeCatalogProducts: ComposedMiddleware<Context>;
+  handleGetCatalogProducts: ComposedMiddleware<Context>;
 }
 
 export { ProductsController };
