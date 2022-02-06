@@ -4,6 +4,7 @@ import cors from "koa2-cors";
 import logger from "koa-logger";
 import { config } from "./config";
 import { productsRouter } from "./routes/productsRouter";
+import { mergedProductsMiddleware } from "./application/middleware/mergedProductsMiddleware";
 
 const app = new Koa();
 
@@ -16,7 +17,7 @@ app.use(
   })
 );
 app.use(logger());
-app.use(bodyParser());
+app.use(mergedProductsMiddleware);
 app.use(productsRouter.routes());
 
 const server = app

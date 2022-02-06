@@ -8,7 +8,7 @@ import {
 } from "../../entities/catalogProduct";
 import { errors } from "../../utils/errors";
 
-const getMergedProducts = async (): Promise<CatalogProduct[]> => {
+const mergeProducts = async (): Promise<boolean> => {
   try {
     const totalListOfCatalogProducts = await getTotalListOfCatalogProducts();
 
@@ -21,8 +21,7 @@ const getMergedProducts = async (): Promise<CatalogProduct[]> => {
       skuToProductsMapForMergedProducts
     );
 
-    await saveMergedCatalogProduct(mergedProducts);
-    return Promise.resolve(mergedProducts);
+    return await saveMergedCatalogProduct(mergedProducts);
   } catch (error) {
     console.log("error", error);
     throw errors.createHttpError(
@@ -32,4 +31,4 @@ const getMergedProducts = async (): Promise<CatalogProduct[]> => {
   }
 };
 
-export { getMergedProducts };
+export { mergeProducts };

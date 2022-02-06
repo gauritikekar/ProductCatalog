@@ -54,8 +54,6 @@ const getSkuToProductMapForMergedCatalogProducts = async (
     "./src/infrastructure/fileStorage/input/barcodesB.csv"
   );
 
-  console.log('barcodeToProductMapForA', barcodeToProductMapForA);
-  
   const skuToProductMap: Map<string, ProductMapValue> = new Map();
 
   barcodeToProductMapForA.forEach((value, key) => {
