@@ -1,11 +1,11 @@
 import { StatusCodes } from "http-status-codes";
-import { getSkuToProductMapForMergedCatalogProducts } from "../../entities/barcode";
+import { getBarcodeMapForMergedCatalogProducts } from "../../entities/barcode";
 import {
   CatalogProduct,
   getMergedCatalogProducts,
   getTotalListOfCatalogProducts,
   saveMergedCatalogProduct,
-  getProducts
+  getProducts,
 } from "../../entities/catalogProduct";
 import { errors } from "../../utils/errors";
 
@@ -13,13 +13,12 @@ const mergeProducts = async (): Promise<boolean> => {
   try {
     const totalListOfCatalogProducts = await getTotalListOfCatalogProducts();
 
-    const skuToProductsMapForMergedProducts =
-      await getSkuToProductMapForMergedCatalogProducts(
-        totalListOfCatalogProducts
-      );
+    const barcodeMapForMergedCatalogProducts =
+      await getBarcodeMapForMergedCatalogProducts();
 
     const mergedProducts = getMergedCatalogProducts(
-      skuToProductsMapForMergedProducts
+      barcodeMapForMergedCatalogProducts,
+      totalListOfCatalogProducts
     );
 
     return await saveMergedCatalogProduct(mergedProducts);
@@ -32,16 +31,15 @@ const mergeProducts = async (): Promise<boolean> => {
   }
 };
 
-const getMergedProducts = async(): Promise<CatalogProduct[]> => {
-  try{
+const getMergedProducts = async (): Promise<CatalogProduct[]> => {
+  try {
     return await getProducts();
-  }
-  catch(error) {
+  } catch (error) {
     console.log("error", error);
     throw errors.createHttpError(
       new Error(`Error in getting products catalog`),
       StatusCodes.INTERNAL_SERVER_ERROR
     );
   }
-}
+};
 export { mergeProducts, getMergedProducts };

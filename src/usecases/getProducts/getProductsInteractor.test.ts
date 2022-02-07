@@ -21,9 +21,9 @@ describe("getProducts", () => {
     .spyOn(productsEntity, "getMergedCatalogProducts")
     .mockReturnValue([mockProduct]);
 
-  const getSkuToProductMapForMergedCatalogProductsSpy = jest.spyOn(
+  const getBarcodeMapForCatalogProductsSpy = jest.spyOn(
     barcodeEntity,
-    "getSkuToProductMapForMergedCatalogProducts"
+    "getBarcodeMapForMergedCatalogProducts"
   );
 
   afterEach(() => {
@@ -34,16 +34,16 @@ describe("getProducts", () => {
     await mergeProducts();
 
     expect(getListOfTotalProductsSpy).toHaveBeenCalled();
-    expect(getSkuToProductMapForMergedCatalogProductsSpy).toHaveBeenCalled();
+    expect(getBarcodeMapForCatalogProductsSpy).toHaveBeenCalled();
     expect(getMergedCatalogProductsSpy).toHaveBeenCalled();
     expect(saveMergedCatalogProductSpy).toHaveBeenCalled();
   });
 
   it.each`
-    entity            | functionName                                    | description
-    ${productsEntity} | ${"getTotalListOfCatalogProducts"}              | ${"products entity throws error while getting total list of catalog products"}
-    ${productsEntity} | ${"saveMergedCatalogProduct"}                   | ${"products entity throws error while saving merged catalog products"}
-    ${barcodeEntity}  | ${"getSkuToProductMapForMergedCatalogProducts"} | ${"barcode entity throws error while getting sku to product map"}
+    entity            | functionName                               | description
+    ${productsEntity} | ${"getTotalListOfCatalogProducts"}         | ${"products entity throws error while getting total list of catalog products"}
+    ${productsEntity} | ${"saveMergedCatalogProduct"}              | ${"products entity throws error while saving merged catalog products"}
+    ${barcodeEntity}  | ${"getBarcodeMapForMergedCatalogProducts"} | ${"barcode entity throws error while getting sku to product map"}
   `("should throw error if $description", async ({ entity, functionName }) => {
     jest
       .spyOn(entity, functionName)
