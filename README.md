@@ -67,7 +67,7 @@ Test cases have also been included in every folder as part of [TDD](https://en.w
 - Tests are implemented using Jest
 
 # End points
-1. `GET /products` - merges the catalog from catalogA.csv and catalogB.csv for unique products and returns it 
+1. `GET /products` - merges the catalog from catalogA.csv and catalogB.csv in output_results under output folde for unique products and returns it 
 ```
     [
     {
