@@ -5,7 +5,7 @@ import { toHttpStatus } from "../../utils/errors";
 
 let isLoaded = false;
 
-const mergedProductsMiddleware: Middleware = async (
+const mergeProductsMiddleware: Middleware = async (
   ctx: Context,
   next: Next
 ) => {
@@ -24,4 +24,4 @@ const mergedProductsMiddleware: Middleware = async (
   }
 };
 
-export { mergedProductsMiddleware };
+export { mergeProductsMiddleware };
