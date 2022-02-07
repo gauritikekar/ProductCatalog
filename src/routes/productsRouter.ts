@@ -4,6 +4,6 @@ import { createProductsController } from "../application/product/productsControl
 const productsRouter = new Router();
 const productsController = createProductsController();
 
-productsRouter.get("/products", productsController.handleGetProducts);
+productsRouter.get("/products", productsController.handleGetCatalogProducts);
 
 export { productsRouter };

@@ -11,6 +11,7 @@ interface ProductCatalogRespository {
     products: CatalogProduct[],
     fileName: string
   ): Promise<boolean>;
+  getMergedCatalogProducts(fileName: string) : Promise<CatalogProduct[]>;
 }
 
 export { ProductCatalogRespository };

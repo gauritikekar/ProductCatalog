@@ -42,9 +42,27 @@ const getBarcodeToProductMap = async (
   }
 };
 
+const getDescription = (
+  catalogProducts: CatalogProduct[],
+  mapValue: ProductMapValue
+): string => {
+  const filteredProduct = catalogProducts.filter(
+    (product) =>
+      product.source === mapValue.source && product.sku === mapValue.sku
+  );
+
+  const productDescription =
+    filteredProduct && filteredProduct.length > 0
+      ? filteredProduct[0].description
+      : "";
+
+  return productDescription;
+};
+
 const getSkuToProductMapForMergedCatalogProducts = async (
   catalogProducts: CatalogProduct[]
 ): Promise<Map<string, ProductMapValue>> => {
+  // map for barcode to product data
   const barcodeToProductMapForA = await getBarcodeToProductMap(
     "A",
     "./src/infrastructure/fileStorage/input/barcodesA.csv"
@@ -54,32 +72,27 @@ const getSkuToProductMapForMergedCatalogProducts = async (
     "./src/infrastructure/fileStorage/input/barcodesB.csv"
   );
 
+  // map for sku to product data
   const skuToProductMap: Map<string, ProductMapValue> = new Map();
 
   barcodeToProductMapForA.forEach((value, key) => {
     if (barcodeToProductMapForB.has(key)) {
+      // remove duplicate entries from source B
       barcodeToProductMapForB.delete(key);
     }
 
-    const productDescription = catalogProducts.filter(
-      (product) => product.source === value.source && product.sku === value.sku
-    )[0].description;
-
+    // only unique entried will be added from source A
     skuToProductMap.set(value.sku, {
       ...value,
-      description: productDescription,
+      description: getDescription(catalogProducts, value),
     });
   });
 
   barcodeToProductMapForB.forEach((value, key) => {
-    // TODO this to be removed to a common place
-    const productDescription = catalogProducts.filter(
-      (product) => product.source === value.source && product.sku === value.sku
-    )[0].description;
-
+    // only unique entried will be added from source B
     skuToProductMap.set(value.sku, {
       ...value,
-      description: productDescription,
+      description: getDescription(catalogProducts, value),
     });
   });
   return skuToProductMap;

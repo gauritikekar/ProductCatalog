@@ -78,6 +78,30 @@ const createProductsCatalogRepository = (): ProductCatalogRespository => ({
         .catch((error) => reject(error));
     });
   },
+
+  async getMergedCatalogProducts(
+    fileName: string
+  ): Promise<CatalogProduct[]> {
+    return new Promise((resolve, reject) => {
+      const products: CatalogProduct[] = [];
+      fs.createReadStream(fileName)
+        .pipe(csv())
+        .on("data", (data) =>
+          products.push({
+            source: data.Source,
+            sku: data.SKU,
+            description: data.Description,
+          })
+        )
+        .on("end", () => {
+          resolve(products);
+        })
+        .on("error", (error) => {
+          reject(error);
+        });
+    });
+  },
+
 });
 
 export { createProductsCatalogRepository };

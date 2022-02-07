@@ -56,9 +56,21 @@ const saveMergedCatalogProduct = async (
   }
 };
 
+const getProducts = async (): Promise<CatalogProduct[]> => {
+  const productsCatalogRepository = createProductsCatalogRepository();
+  try {
+    return await productsCatalogRepository.getMergedCatalogProducts(
+      "./src/infrastructure/fileStorage/output/result_output.csv"
+    );
+}
+catch (error) {
+  throw error;
+}
+}
 export {
   CatalogProduct,
   getTotalListOfCatalogProducts,
   getMergedCatalogProducts,
   saveMergedCatalogProduct,
+  getProducts
 };

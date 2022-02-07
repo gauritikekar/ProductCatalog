@@ -47,9 +47,9 @@ describe("getProducts", () => {
   `("should throw error if $description", async ({ entity, functionName }) => {
     jest
       .spyOn(entity, functionName)
-      .mockRejectedValue(new Error("Error in getting products catalog"));
+      .mockRejectedValue(new Error("Error in merging products catalog"));
     await expect(mergeProducts()).rejects.toThrowError(
-      "Error in getting products catalog"
+      "Error in merging products catalog"
     );
   });
 });
