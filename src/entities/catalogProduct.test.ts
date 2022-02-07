@@ -68,13 +68,12 @@ describe("catalogProducts", () => {
   });
 
   describe("getMergedCatalogProducts", () => {
-    it("should return merged catalog product for the given map of Sku to product", () => {
-      const mockSkuToProductsMap = new Map();
-      mockSkuToProductsMap.set("1ewe3-34wd", {
+    it("should return merged catalog product for the given barcode map", () => {
+      const mockBarcodeMap = new Map();
+      mockBarcodeMap.set("2s332sdsds3232da", {
         source: "A",
         supplierId: "001",
         sku: "1ewe3-34wd",
-        description: "product name A",
       });
       const mergedProducts = [
         {
@@ -83,7 +82,8 @@ describe("catalogProducts", () => {
           source: "A",
         },
       ];
-      expect(getMergedCatalogProducts(mockSkuToProductsMap)).toEqual(
+
+      expect(getMergedCatalogProducts(mockBarcodeMap, mergedProducts)).toEqual(
         mergedProducts
       );
     });
@@ -128,7 +128,7 @@ describe("catalogProducts", () => {
       const mockSaveMergedCatalogProduct = jest
         .fn()
         .mockRejectedValue(new Error("Error in saving products"));
-      
+
       const mockProductRepository: Partial<ProductCatalogRespository> = {
         saveMergedCatalogProduct: mockSaveMergedCatalogProduct,
       };

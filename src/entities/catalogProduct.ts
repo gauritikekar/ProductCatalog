@@ -27,15 +27,39 @@ const getTotalListOfCatalogProducts = async (): Promise<CatalogProduct[]> => {
   }
 };
 
+const getDescription = (
+  catalogProducts: CatalogProduct[],
+  mapValue: ProductMapValue
+): string => {
+  const filteredProduct = catalogProducts.filter(
+    (product) =>
+      product.source === mapValue.source && product.sku === mapValue.sku
+  );
+
+  const productDescription =
+    filteredProduct && filteredProduct.length > 0
+      ? filteredProduct[0].description
+      : "";
+
+  return productDescription;
+};
+
 const getMergedCatalogProducts = (
-  skuToProductsMap: Map<string, ProductMapValue>
+  barcodeMap: Map<string, ProductMapValue>,
+  totalCatalogProducts: CatalogProduct[]
 ): CatalogProduct[] => {
+  // create a map from barcodeMap with SKU as key to get unique entries for the SKUs
+  const skuMap = new Map();
+  barcodeMap.forEach((value) => {
+    skuMap.set(value.sku, value);
+  });
+
   const mergedProducts: CatalogProduct[] = [];
-  skuToProductsMap.forEach((item) => {
+  skuMap.forEach((value) => {
     const product: CatalogProduct = {
-      sku: item.sku,
-      description: item.description ?? "",
-      source: item.source,
+      sku: value.sku,
+      description: getDescription(totalCatalogProducts, value),
+      source: value.source,
     };
     mergedProducts.push(product);
   });
@@ -62,15 +86,14 @@ const getProducts = async (): Promise<CatalogProduct[]> => {
     return await productsCatalogRepository.getMergedCatalogProducts(
       "./src/infrastructure/fileStorage/output/result_output.csv"
     );
-}
-catch (error) {
-  throw error;
-}
-}
+  } catch (error) {
+    throw error;
+  }
+};
 export {
   CatalogProduct,
   getTotalListOfCatalogProducts,
   getMergedCatalogProducts,
   saveMergedCatalogProduct,
-  getProducts
+  getProducts,
 };
