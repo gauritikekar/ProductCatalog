@@ -48,7 +48,6 @@ const getUniqueMergedBarcodeMap = (
 ): Map<string, ProductMapValue> => {
   barcodeMapA.forEach((value, key) => {
     if (barcodeMapB.has(key)) {
-      // remove duplicate entries from source B
       barcodeMapB.delete(key);
     }
   });

@@ -28,10 +28,10 @@ const getTotalListOfCatalogProducts = async (): Promise<CatalogProduct[]> => {
 };
 
 const getDescription = (
-  catalogProducts: CatalogProduct[],
+  totalCatalogProducts: CatalogProduct[],
   mapValue: ProductMapValue
 ): string => {
-  const filteredProduct = catalogProducts.filter(
+  const filteredProduct = totalCatalogProducts.filter(
     (product) =>
       product.source === mapValue.source && product.sku === mapValue.sku
   );
