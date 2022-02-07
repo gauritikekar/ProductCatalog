@@ -15,7 +15,7 @@ interface ProductMapValue {
   description?: string;
 }
 
-const getBarcodeToProductMap = async (
+const getBarcodeMap = async (
   source: string,
   fileName: string
 ): Promise<Map<string, ProductMapValue>> => {
@@ -42,65 +42,37 @@ const getBarcodeToProductMap = async (
   }
 };
 
-const getDescription = (
-  catalogProducts: CatalogProduct[],
-  mapValue: ProductMapValue
-): string => {
-  const filteredProduct = catalogProducts.filter(
-    (product) =>
-      product.source === mapValue.source && product.sku === mapValue.sku
-  );
-
-  const productDescription =
-    filteredProduct && filteredProduct.length > 0
-      ? filteredProduct[0].description
-      : "";
-
-  return productDescription;
+const getUniqueMergedBarcodeMap = (
+  barcodeMapA: Map<string, ProductMapValue>,
+  barcodeMapB: Map<string, ProductMapValue>
+): Map<string, ProductMapValue> => {
+  barcodeMapA.forEach((value, key) => {
+    if (barcodeMapB.has(key)) {
+      // remove duplicate entries from source B
+      barcodeMapB.delete(key);
+    }
+  });
+  return new Map([...barcodeMapA, ...barcodeMapB]);
 };
 
-const getSkuToProductMapForMergedCatalogProducts = async (
-  catalogProducts: CatalogProduct[]
-): Promise<Map<string, ProductMapValue>> => {
-  // map for barcode to product data
-  const barcodeToProductMapForA = await getBarcodeToProductMap(
+const getBarcodeMapForMergedCatalogProducts = async (): Promise<
+  Map<string, ProductMapValue>
+> => {
+  const barcodeMapA = await getBarcodeMap(
     "A",
     "./src/infrastructure/fileStorage/input/barcodesA.csv"
   );
-  const barcodeToProductMapForB = await getBarcodeToProductMap(
+  const barcodeMapB = await getBarcodeMap(
     "B",
     "./src/infrastructure/fileStorage/input/barcodesB.csv"
   );
 
-  // map for sku to product data
-  const skuToProductMap: Map<string, ProductMapValue> = new Map();
-
-  barcodeToProductMapForA.forEach((value, key) => {
-    if (barcodeToProductMapForB.has(key)) {
-      // remove duplicate entries from source B
-      barcodeToProductMapForB.delete(key);
-    }
-
-    // only unique entried will be added from source A
-    skuToProductMap.set(value.sku, {
-      ...value,
-      description: getDescription(catalogProducts, value),
-    });
-  });
-
-  barcodeToProductMapForB.forEach((value, key) => {
-    // only unique entried will be added from source B
-    skuToProductMap.set(value.sku, {
-      ...value,
-      description: getDescription(catalogProducts, value),
-    });
-  });
-  return skuToProductMap;
+  return getUniqueMergedBarcodeMap(barcodeMapA, barcodeMapB);
 };
 
 export {
   BarcodeFileData,
   ProductMapValue,
-  getBarcodeToProductMap,
-  getSkuToProductMapForMergedCatalogProducts,
+  getBarcodeMap,
+  getBarcodeMapForMergedCatalogProducts,
 };
